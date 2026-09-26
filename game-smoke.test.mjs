@@ -14,6 +14,7 @@ class Element {
   querySelector(key) { if (!this.children.has(key)) this.children.set(key, new Element(key)); return this.children.get(key); }
   focus() {} select() {} matches() { return false; }
   click() { assert.equal(this.disabled, false, `Button ${this.id} is enabled`); for (const callback of this.handlers.click || []) callback(); }
+  submit() { for (const callback of this.handlers.submit || []) callback({ preventDefault() {} }); }
 }
 
 function setup(hash = '') {
@@ -63,9 +64,27 @@ try {
   await import(`./game.js?hostSmoke=${Date.now()}`);
   await Promise.resolve(); await Promise.resolve();
   host.get('online-button').click();
+  host.get('host-form').submit();
+  assert.equal(host.sockets.length, 0, 'An empty passcode is explained without connecting');
+  assert.equal(host.get('host-key').attrs['aria-invalid'], 'true');
+  host.get('host-key').value = 'incorrect-code';
+  host.get('host-form').submit();
+  const rejectedWire = host.sockets[0];
+  rejectedWire.open();
+  rejectedWire.receive({ type: 'error', code: 'invalid-host-passcode', message: 'That passcode did not match.' });
+  rejectedWire.close();
+  assert.equal(host.get('online-create').disabled, false, 'Rejected passcode allows retry');
+  assert.equal(host.get('host-key').value, 'incorrect-code', 'Entered value is retained for correction');
+  assert.equal(host.get('host-key-details').open, true);
+  assert.equal(host.get('online-message').textContent, 'That passcode did not match.', 'Socket close preserves useful error');
   host.get('host-key').value = 'host-code';
-  host.get('online-create').click();
-  const wire = host.sockets[0];
+  host.get('host-key').type = 'password';
+  host.get('show-host-key').click();
+  assert.equal(host.get('host-key').type, 'text');
+  host.get('show-host-key').click();
+  assert.equal(host.get('host-key').type, 'password');
+  host.get('host-form').submit();
+  const wire = host.sockets[1];
   wire.open();
   assert.deepEqual(wire.sent[0], { type: 'create', hostKey: 'host-code' });
   wire.receive({ type: 'created', token: 'private-invitation' });

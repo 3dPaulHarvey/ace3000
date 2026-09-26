@@ -90,10 +90,10 @@ async def websocket(request):
             supplied = hello.get("hostKey", "")
             expected = request.app[HOST_KEY]
             if not isinstance(supplied, str) or (expected and not hmac.compare_digest(supplied.encode(), expected.encode())):
-                await send(ws, {"type": "error", "message": "That host passcode is not correct."})
+                await send(ws, {"type": "error", "code": "invalid-host-passcode", "message": "That passcode did not match. Check the saved passcode in your Render service's Environment settings."})
                 return ws
             if lobby.host is not None:
-                await send(ws, {"type": "error", "message": "A room is already open. Close it before creating another."})
+                await send(ws, {"type": "error", "code": "room-already-open", "message": "A room is already open in another host tab. Return to that tab to copy its invitation, or close it before creating a new room."})
                 return ws
             role = "host"
             lobby.host = ws

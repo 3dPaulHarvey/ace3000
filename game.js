@@ -154,11 +154,19 @@ function leaveRoom() {
   const attract = new Dogfight();
   Object.assign(game, { phase: attract.phase, players: attract.players, bullets: [], particles: [], time: 0, winner: null });
   $('host-key').value = '';
+  hideHostPasscode();
   announcementUntil = 0;
   syncInterface();
 }
 
 function connectRoom(role) {
+  if (role === 'host' && hostKeyRequired && !$('host-key').value) {
+    onlineMessage('Enter the host passcode saved in Render before creating a room.', true);
+    $('host-key').setAttribute('aria-invalid', 'true');
+    $('host-key').focus();
+    return;
+  }
+  $('host-key').setAttribute('aria-invalid', 'false');
   audio.unlock();
   onlineMessage('Connecting to your private airspace…');
   $('online-create').disabled = true;
@@ -170,6 +178,7 @@ function connectRoom(role) {
 function handleNetworkMessage(message) {
   if (message.type === 'created') {
     $('host-key').value = '';
+    hideHostPasscode();
     $('host-key-label').hidden = true;
     $('online-create').hidden = true;
     $('invite-box').hidden = false;
@@ -222,6 +231,11 @@ function handleNetworkMessage(message) {
     $('online-join').disabled = !onlineAvailable;
     $('host-key-label').hidden = !hostKeyRequired || network.role !== 'host';
     if (message.type !== 'disconnected' || !onlineError) onlineMessage(message.message || 'Connection lost. Reconnect to open a new room or rejoin your friend.', true);
+    if (message.code === 'invalid-host-passcode') {
+      $('host-key').setAttribute('aria-invalid', 'true');
+      $('host-key-details').open = true;
+      $('host-key').focus();
+    }
   }
   syncInterface();
 }
@@ -518,7 +532,25 @@ $('fullscreen-button').addEventListener('click', fullscreen);
 $('online-button').addEventListener('click', openLobby);
 $('online-back').addEventListener('click', leaveRoom);
 $('leave-room').addEventListener('click', leaveRoom);
-$('online-create').addEventListener('click', () => connectRoom('host'));
+$('host-form').addEventListener('submit', event => {
+  event.preventDefault();
+  if (!$('online-create').disabled && !$('online-create').hidden) connectRoom('host');
+});
+$('show-host-key').addEventListener('click', () => {
+  const reveal = $('host-key').type === 'password';
+  $('host-key').type = reveal ? 'text' : 'password';
+  $('show-host-key').textContent = reveal ? 'HIDE' : 'SHOW';
+  $('show-host-key').setAttribute('aria-label', reveal ? 'Hide host passcode' : 'Show host passcode');
+  $('show-host-key').setAttribute('aria-pressed', String(reveal));
+});
+function hideHostPasscode() {
+  $('host-key').type = 'password';
+  $('show-host-key').textContent = 'SHOW';
+  $('show-host-key').setAttribute('aria-label', 'Show host passcode');
+  $('show-host-key').setAttribute('aria-pressed', 'false');
+  $('host-key').setAttribute('aria-invalid', 'false');
+  $('host-key-details').open = false;
+}
 $('online-join').addEventListener('click', () => connectRoom('guest'));
 $('online-start').addEventListener('click', () => {
   if (network.role !== 'host' || !network.peerReady) return;

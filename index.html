@@ -55,8 +55,15 @@
               <h2>FLY TOGETHER</h2>
               <p id="online-message" class="online-message" role="status">Create a private room and invite your friend.</p>
               <p id="online-identity" class="online-identity">YOU: PLAYER 1 · WASD &nbsp; / &nbsp; FRIEND: PLAYER 2 · ARROWS</p>
-              <label class="host-key-label" id="host-key-label" hidden>HOST PASSCODE<input type="password" id="host-key" autocomplete="off" placeholder="Your server’s host passcode" maxlength="256"></label>
-              <button class="start-button" id="online-create">CREATE PRIVATE ROOM <span class="button-arrow">↗</span></button>
+              <form id="host-form" novalidate>
+                <div class="host-key-label" id="host-key-label" hidden>
+                  <label for="host-key">HOST PASSCODE</label>
+                  <div class="host-key-entry"><input type="password" id="host-key" autocomplete="current-password" placeholder="Passcode saved in Render" maxlength="256" aria-describedby="host-key-help" aria-errormessage="online-message"><button type="button" id="show-host-key" aria-label="Show host passcode" aria-pressed="false">SHOW</button></div>
+                  <p id="host-key-help">Enter the passcode you saved when deploying this game.</p>
+                  <details id="host-key-details"><summary>Where do I find my passcode?</summary><p>Open your game’s service in the <a href="https://dashboard.render.com/" target="_blank" rel="noopener noreferrer">Render dashboard</a>, then <strong>Environment</strong>. Copy the <strong>Value</strong> for <code>ACE_HOST_KEY</code> into this box.</p><p>To change it, edit that value in Render and choose <strong>Save and deploy</strong>. Wait for the service to be Live, then enter the updated passcode here.</p></details>
+                </div>
+                <button type="submit" class="start-button" id="online-create">CREATE PRIVATE ROOM <span class="button-arrow">↗</span></button>
+              </form>
               <button class="start-button" id="online-join" hidden>JOIN AS PLAYER 2 <span class="button-arrow">↗</span></button>
               <div class="invite-box" id="invite-box" hidden><label for="invite-link">SEND THIS INVITATION TO YOUR FRIEND</label><div><input id="invite-link" readonly aria-label="Private invitation link"><button id="copy-invite">COPY LINK</button></div><small id="invite-note">Keep this page open while your friend joins.</small></div>
               <button class="start-button" id="online-start" hidden disabled>WAITING FOR FRIEND…</button>

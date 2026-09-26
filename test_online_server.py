@@ -35,6 +35,9 @@ class OnlineGameTests(unittest.IsolatedAsyncioTestCase):
     async def test_host_passcode_and_invalid_invitation(self):
         _, reply = await self.connect({"type": "create", "hostKey": "wrong"})
         self.assertEqual(reply["type"], "error")
+        self.assertEqual(reply["code"], "invalid-host-passcode")
+        host, reply = await self.connect({"type": "create", "hostKey": "test-host-passcode"})
+        self.assertEqual(reply["type"], "created", 'A wrong passcode must not block the next correct attempt')
         _, reply = await self.connect({"type": "join", "token": "unknown"})
         self.assertEqual(reply["type"], "error")
         response = await self.client.get('/api/config')
