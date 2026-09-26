@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111418">
+  <meta name="description" content="Two pilots. One keyboard. A local multiplayer arcade dogfight inspired by Ace (1976).">
+  <title>ACE 3000 — Two pilots. One sky.</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231743ff'/%3E%3Cpath d='M5 9h16v4H9v3h18v4H9v3H5v-6H2v-4h3z' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="online.css">
+</head>
+<body>
+  <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="icon-plane" viewBox="0 0 32 24"><path fill="currentColor" d="M7 2h16v4H13v4h13V7h3v11h-3v-4H13v4h10v4H7v-8H3v-4h4z"/></symbol>
+    <symbol id="icon-sound" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5Zm4 3a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol>
+    <symbol id="icon-expand" viewBox="0 0 24 24"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/></symbol>
+    <symbol id="icon-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></symbol>
+    <symbol id="icon-reset" viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6"/></symbol>
+  </svg>
+
+  <div class="app-shell" id="app">
+    <header class="masthead">
+      <a class="brand" href="./" aria-label="Ace 3000 home"><svg class="brand-plane"><use href="#icon-plane"/></svg><span>ACE<span class="brand-number">3000</span></span></a>
+      <div class="masthead-note"><span class="status-dot"></span> THE ARCADE LIVES ON <span class="edition">/ EST. 1976</span></div>
+    </header>
+
+    <main>
+      <div class="above-game"><span><span class="tiny-cross">+</span><span id="mode-label">LOCAL + ONLINE MULTIPLAYER</span></span><span id="connection-label">02 PILOTS <span class="separator">/</span> 01 RIVALRY</span></div>
+      <section class="cabinet" aria-label="Two player arcade game">
+        <div class="scoreboard">
+          <div class="pilot-score pilot-one"><div class="pilot-id"><svg><use href="#icon-plane"/></svg><div><span class="eyebrow">PLAYER 01</span><span class="pilot-name">MAVERICK</span></div></div><div class="score" id="score-one" aria-label="Player one score">00</div><div class="score-pips" id="pips-one" aria-hidden="true"></div></div>
+          <div class="match-meta"><span class="match-rule">FIRST TO <b>05</b></span><span class="match-status" id="match-status">AWAITING PILOTS</span></div>
+          <div class="pilot-score pilot-two"><div class="score-pips" id="pips-two" aria-hidden="true"></div><div class="score" id="score-two" aria-label="Player two score">00</div><div class="pilot-id"><div><span class="eyebrow">PLAYER 02</span><span class="pilot-name">BANDIT</span></div><svg><use href="#icon-plane"/></svg></div></div>
+        </div>
+
+        <div class="arena" id="arena">
+          <canvas id="game" width="960" height="560" tabindex="-1" aria-label="Dogfight arena. Player one uses A and D to turn, W to boost, S to fire. Player two uses left and right arrows to turn, up to boost, down to fire."></canvas>
+          <div class="arena-grain" aria-hidden="true"></div>
+          <div class="arena-coordinate top-left" aria-hidden="true">ACE / AIRSPACE 001</div>
+          <div class="arena-coordinate top-right" id="flight-time" aria-hidden="true">00:00</div>
+          <div class="overlay" id="overlay">
+            <div class="intro" id="intro">
+              <p class="intro-kicker"><span></span> THE HEAD-TO-HEAD CLASSIC <span></span></p>
+              <h1 class="game-title"><span class="sr-only">ACE 3000</span><svg id="pixel-title" viewBox="0 0 170 70" aria-hidden="true"></svg><span class="title-number" aria-hidden="true">3000</span></h1>
+              <p class="tagline">Two pilots. One sky.</p>
+              <p class="intro-description">Take the controls. Chase your rival.<br>Five hits make an ace.</p>
+              <button class="start-button" id="start-button"><svg><use href="#icon-play"/></svg><span>START DOGFIGHT</span><span class="button-arrow">↗</span></button>
+              <p class="enter-hint">OR PRESS <kbd>ENTER</kbd></p>
+              <button class="online-entry" id="online-button">PLAY A FRIEND ONLINE <span>↗</span></button>
+            </div>
+            <div class="online-panel" id="online-panel" hidden>
+              <p class="intro-kicker">PRIVATE AIRSPACE / TWO SEATS ONLY</p>
+              <h2>FLY TOGETHER</h2>
+              <p id="online-message" class="online-message" role="status">Create a private room and invite your friend.</p>
+              <p id="online-identity" class="online-identity">YOU: PLAYER 1 · WASD &nbsp; / &nbsp; FRIEND: PLAYER 2 · ARROWS</p>
+              <label class="host-key-label" id="host-key-label" hidden>HOST PASSCODE<input type="password" id="host-key" autocomplete="off" placeholder="Your server’s host passcode" maxlength="256"></label>
+              <button class="start-button" id="online-create">CREATE PRIVATE ROOM <span class="button-arrow">↗</span></button>
+              <button class="start-button" id="online-join" hidden>JOIN AS PLAYER 2 <span class="button-arrow">↗</span></button>
+              <div class="invite-box" id="invite-box" hidden><label for="invite-link">SEND THIS INVITATION TO YOUR FRIEND</label><div><input id="invite-link" readonly aria-label="Private invitation link"><button id="copy-invite">COPY LINK</button></div><small id="invite-note">Keep this page open while your friend joins.</small></div>
+              <button class="start-button" id="online-start" hidden disabled>WAITING FOR FRIEND…</button>
+              <button class="online-back" id="online-back">← BACK TO LOCAL PLAY</button>
+            </div>
+            <div class="pause-panel" id="pause-panel" hidden><p class="intro-kicker">HOLDING PATTERN</p><h2>PAUSED</h2><p class="tagline">Catch your breath, pilots.</p><button class="start-button" id="resume-button"><svg><use href="#icon-play"/></svg>RESUME FLIGHT<span class="button-arrow">↗</span></button><p class="enter-hint">OR PRESS <kbd>ESC</kbd></p></div>
+            <div class="win-panel" id="win-panel" hidden><p class="intro-kicker">WE HAVE AN ACE</p><svg class="winner-plane"><use href="#icon-plane"/></svg><h2 id="winner-name">MAVERICK</h2><p class="tagline" id="winner-summary">Owns the sky.</p><button class="start-button" id="rematch-button"><svg><use href="#icon-reset"/></svg>FLY AGAIN<span class="button-arrow">↗</span></button><p class="enter-hint">OR PRESS <kbd>ENTER</kbd></p></div>
+          </div>
+          <div class="hit-announcement" id="hit-announcement" role="status" aria-live="polite"></div>
+          <div class="arena-bottom"><span><span class="live-dot"></span><span id="arena-status">READY WHEN YOU ARE</span></span><span id="arena-tip">NO QUARTERS REQUIRED</span></div>
+        </div>
+
+        <div class="game-toolbar"><div class="toolbar-caption"><span class="tiny-cross">+</span><span id="toolbar-caption">A friendly rivalry. An endless sky.</span></div><div class="toolbar-actions"><button class="tool-button leave-button" id="leave-room" hidden>LEAVE ROOM</button><button class="tool-button" id="pause-button" aria-label="Pause game" title="Pause (Esc)" disabled><svg><use href="#icon-pause"/></svg><span>PAUSE</span></button><button class="tool-button" id="sound-button" aria-label="Mute sound" aria-pressed="true" title="Toggle sound (M)"><svg><use href="#icon-sound"/></svg><span id="sound-label">SOUND ON</span></button><button class="tool-button" id="fullscreen-button" aria-label="Enter fullscreen" title="Fullscreen (F)"><svg><use href="#icon-expand"/></svg><span>FULLSCREEN</span></button></div></div>
+      </section>
+
+      <section class="controls" aria-label="Flight controls">
+        <div class="control-card"><div class="control-label"><span class="player-badge">01</span><div><h2>MAVERICK</h2><p>LEFT SIDE OF THE KEYBOARD</p></div></div><div class="key-guide"><div><span class="key-pair"><kbd data-code="KeyA">A</kbd><kbd data-code="KeyD">D</kbd></span><span>TURN</span></div><div><kbd data-code="KeyW">W</kbd><span>BOOST</span></div><div><kbd data-code="KeyS">S</kbd><span>FIRE</span></div></div></div>
+        <div class="control-divider" aria-hidden="true">VS</div>
+        <div class="control-card second-player"><div class="control-label"><span class="player-badge">02</span><div><h2>BANDIT</h2><p>RIGHT SIDE OF THE KEYBOARD</p></div></div><div class="key-guide"><div><span class="key-pair"><kbd data-code="ArrowLeft" aria-label="Left arrow">←</kbd><kbd data-code="ArrowRight" aria-label="Right arrow">→</kbd></span><span>TURN</span></div><div><kbd data-code="ArrowUp" aria-label="Up arrow">↑</kbd><span>BOOST</span></div><div><kbd data-code="ArrowDown" aria-label="Down arrow">↓</kbd><span>FIRE</span></div></div></div>
+      </section>
+      <p class="play-note">Keep moving. Hold fire. Loop around the edges. <span>May the best pilot win.</span></p>
+      <p class="keyboard-notice">Grab a keyboard and a second pilot to play.</p>
+    </main>
+
+    <footer><span>INSPIRED BY ACE, ALLIED LEISURE, 1976</span><span>REBUILT FOR THE NEXT RIVALRY <span class="footer-star">✦</span></span></footer>
+  </div>
+  <div id="screen-reader-status" class="sr-only" role="status" aria-live="polite"></div>
+  <script type="module" src="game.js"></script>
+</body>
+</html>

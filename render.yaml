@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ace3000
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python online_server.py
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.5
+      - key: ACE_HOST_KEY
+        sync: false

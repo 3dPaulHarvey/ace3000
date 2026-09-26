@@ -1,0 +1,8 @@
+{
+  "name": "ace3000",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node engine.test.mjs && node game-smoke.test.mjs"
+  }
+}
